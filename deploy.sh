@@ -8,7 +8,7 @@ echo "Applying Kubernetes manifests..."
 sudo kubectl apply -f ns.yaml 
 sudo kubectl apply -f data-pvc.yaml
 sudo kubectl apply -f model-pvc.yaml
-sudo kubectl apply -f k8s-train-job.yaml          # Training Job manifest
+sudo kubectl apply -f job.yaml 
 echo "Waiting for training job to complete..."
 # Optionally, wait for job completion
 sudo kubectl wait --for=condition=complete --timeout=1h job/ship-train-job -n $NAMESPACE
