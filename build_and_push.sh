@@ -2,8 +2,8 @@
 set -e
 
 # Set AWS details
-AWS_ACCOUNT_ID="<YOUR_AWS_ACCOUNT_ID>"
-AWS_REGION="<YOUR_AWS_REGION>"         # e.g., us-east-1
+AWS_ACCOUNT_ID=""
+AWS_REGION="us-east-1"         # e.g., us-east-1
 TRAIN_REPO="ship-train"
 INF_REPO="ship-inference"
 
