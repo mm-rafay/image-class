@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ship-train-job
+  namespace: ship-detect
+spec:
+  backoffLimit: 0           # do not retry failed jobs (adjust as needed)
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: trainer
+        image: <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/ship-train:latest
+        imagePullPolicy: Always
+        env:
+          - name: DATA_DIR
+            value: "/mnt/data"          # path to dataset (mounted from PVC)
+          - name: OUTPUT_DIR
+            value: "/mnt/model"         # path to store model artifacts
+          - name: EPOCHS
+            value: "5"                  # number of training epochs (adjustable)
+          # (add envs for LR, batch size, etc., if needed)
+        volumeMounts:
+          - name: dataset-vol
+            mountPath: /mnt/data
+          - name: model-vol
+            mountPath: /mnt/model
+        resources:
+          limits:
+            cpu: "4"
+            memory: "15Gi"
+            nvidia.com/gpu: 1           # request one GPU :contentReference[oaicite:0]{index=0}
+          requests:
+            cpu: "2"
+            memory: "10Gi"
+            nvidia.com/gpu: 1
+      volumes:
+      - name: dataset-vol
+        persistentVolumeClaim:
+          claimName: ship-data-pvc
+      - name: model-vol
+        persistentVolumeClaim:
+          claimName: ship-model-pvc
+      # If GPU nodes are tainted or labeled, include tolerations/nodeSelector:
+      # nodeSelector:
+      #   node.kubernetes.io/instance-type: g4dn.xlarge    # (example label)
+      # tolerations:
+      #   - key: nvidia.com/gpu
+      #     operator: Exists
+      #     effect: NoSchedule
