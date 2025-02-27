@@ -9,4 +9,4 @@ spec:
   resources:
     requests:
       storage: 20Gi        # storage size for dataset (adjust to dataset size)
-  storageClassName: gp2    # or your cluster's default StorageClass
+  storageClassName: local-path    # or your cluster's default StorageClass
