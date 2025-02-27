@@ -7,10 +7,10 @@ NAMESPACE="ship-detect"
 echo "Applying Kubernetes manifests..."
 sudo kubectl apply -f ns.yaml 
 sudo kubectl apply -f data-pvc.yaml
-sudo kubectl apply -f model-pvc.yaml
-sudo kubectl apply -f job.yaml 
 sudo kubectl wait --for=condition=Bound pvc/ship-data-pvc -n ship-detect --timeout=300s
+sudo kubectl apply -f model-pvc.yaml
 sudo kubectl wait --for=condition=Bound pvc/ship-model-pvc -n ship-detect --timeout=300s
+sudo kubectl apply -f job.yaml
 echo "Waiting for training job to complete..."
 # Optionally, wait for job completion
 sudo kubectl wait --for=condition=complete --timeout=1h job/ship-train-job -n $NAMESPACE
