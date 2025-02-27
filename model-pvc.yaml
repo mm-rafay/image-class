@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ship-model-pvc
+  namespace: ship-detect
+spec:
+  accessModes:
+    - ReadWriteOnce        # RWO; for multi-node inference, consider an RWX volume (NFS/EFS)
+  resources:
+    requests:
+      storage: 5Gi         # storage for model files (adjust as needed)
+  storageClassName: gp2
