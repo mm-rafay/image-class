@@ -1,0 +1,17 @@
+# Base image with PyTorch, CUDA 11.7, and cuDNN (for GPU acceleration)
+FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
+
+# Install any additional Python packages (if not already included)
+RUN pip install --no-cache-dir torchvision
+
+# (Optional) If using CLIP or other models, install extra dependencies:
+# RUN pip install --no-cache-dir transformers openai-clip
+
+# Set working directory
+WORKDIR /app
+
+# Copy training script into the container
+COPY train.py /app/train.py
+
+# Use python3 as the entrypoint for training (can be overridden in Kubernetes job)
+ENTRYPOINT ["python3", "/app/train.py"]
