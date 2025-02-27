@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ship-inference
+  namespace: ship-detect
+spec:
+  replicas: 1  # start with 1; HPA can scale this up
+  selector:
+    matchLabels:
+      app: ship-inference
+  template:
+    metadata:
+      labels:
+        app: ship-inference
+    spec:
+      containers:
+      - name: inference
+        image: <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/ship-inference:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 80
+        env:
+          - name: MODEL_PATH
+            value: "/mnt/model/ship_model.pth"   # path to the saved model file (from PVC)
+          # (if needed, additional env like for classes file path)
+        volumeMounts:
+          - name: model-vol
+            mountPath: /mnt/model    # mount model PVC to same path used in training output
+        resources:
+          limits:
+            cpu: "2"
+            memory: "8Gi"
+            nvidia.com/gpu: 1        # allocate one GPU for inference pod
+          requests:
+            cpu: "1"
+            memory: "4Gi"
+            nvidia.com/gpu: 1
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 15
+      volumes:
+      - name: model-vol
+        persistentVolumeClaim:
+          claimName: ship-model-pvc
+      # nodeSelector/tolerations if needed for GPU nodes (similar to training job)
