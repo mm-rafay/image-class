@@ -1,0 +1,16 @@
+# Base image with PyTorch runtime (no dev tools) for a lighter inference image
+FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
+
+# Install FastAPI, Uvicorn server, and other dependencies for inference
+RUN pip install --no-cache-dir fastapi \"uvicorn[standard]\" pillow python-multipart torchvision
+
+WORKDIR /app
+
+# Copy the inference API script into the image
+COPY inference_api.py /app/inference_api.py
+
+# Expose port 80 for the API server
+EXPOSE 80
+
+# Command to start the FastAPI server (serving on port 80)
+CMD [\"uvicorn\", \"inference_api:app\", \"--host\", \"0.0.0.0\", \"--port\", \"80\"]
