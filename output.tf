@@ -1,4 +1,4 @@
 output "API_URL" {
-  value       = "http://10.0.0.149:8080"
-  description = "click here"
+  value       = "http://172.31.74.216/predict"
+  description = "use this endpoint to make predictions"
 }
