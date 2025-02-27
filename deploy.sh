@@ -15,7 +15,7 @@ sudo kubectl wait --for=condition=complete --timeout=1h job/ship-train-job -n $N
 
 echo "Training job completed. Deploying inference service..."
 sudo kubectl apply -f inference-dp.yaml
-sudo kubectl apply -f inference-svc.yamlhpa.yaml
+sudo kubectl apply -f inference-svc.yaml
 sudo kubectl apply -f hpa.yaml
 
 echo "Deployment initiated. You can monitor pods with 'kubectl get pods -n $NAMESPACE'."
