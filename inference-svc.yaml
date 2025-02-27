@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ship-inference-service
+  namespace: ship-detect
+spec:
+  type: LoadBalancer   # creates an external LB with a public endpoint (AWS ELB/NLB)
+  ports:
+    - port: 80         # external port
+      targetPort: 80   # container port
+      protocol: TCP
+  selector:
+    app: ship-inference
