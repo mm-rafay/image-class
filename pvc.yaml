@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ship-data-pvc
+  namespace: ship-detect
+spec:
+  accessModes:
+    - ReadWriteOnce        # Use RWO; if multiple nodes need access, use ReadWriteMany with appropriate StorageClass (e.g., EFS)
+  resources:
+    requests:
+      storage: 20Gi        # storage size for dataset (adjust to dataset size)
+  storageClassName: gp2    # or your cluster's default StorageClass
