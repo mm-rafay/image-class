@@ -1,4 +1,4 @@
-resource "rafay_workload" "ns" {
+/* resource "rafay_workload" "ns" {
   metadata {
     name    = "ns"
     project = "gpu-paas-demo"
@@ -84,7 +84,7 @@ resource "rafay_workload" "job" {
       }
     }
   }
-}
+} */
 
 resource "rafay_workload" "inference-dp" {
   metadata {
