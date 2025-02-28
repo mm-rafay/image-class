@@ -4,7 +4,7 @@ metadata:
   name: ship-train-job
   namespace: ship-detect
 spec:
-  backoffLimit: 0           # do not retry failed jobs (adjust as needed)
+  backoffLimit: 0
   template:
     spec:
       imagePullSecrets:
@@ -16,22 +16,23 @@ spec:
         imagePullPolicy: Always
         env:
           - name: DATA_DIR
-            value: "/mnt/data"          # path to dataset (mounted from PVC)
+            value: "/mnt/data"
           - name: OUTPUT_DIR
-            value: "/mnt/model"         # path to store model artifacts
+            value: "/mnt/model"
           - name: EPOCHS
-            value: "5"                  # number of training epochs (adjustable)
-          # (add envs for LR, batch size, etc., if needed)
+            value: "5"
         volumeMounts:
           - name: dataset-vol
             mountPath: /mnt/data
           - name: model-vol
             mountPath: /mnt/model
+          - name: shm
+            mountPath: /dev/shm
         resources:
           limits:
             cpu: "4"
             memory: "15Gi"
-            nvidia.com/gpu: 1           # request one GPU :contentReference[oaicite:0]{index=0}
+            nvidia.com/gpu: 1
           requests:
             cpu: "2"
             memory: "10Gi"
@@ -43,10 +44,7 @@ spec:
       - name: model-vol
         persistentVolumeClaim:
           claimName: ship-model-pvc
-      # If GPU nodes are tainted or labeled, include tolerations/nodeSelector:
-      # nodeSelector:
-      #   node.kubernetes.io/instance-type: g4dn.xlarge    # (example label)
-      # tolerations:
-      #   - key: nvidia.com/gpu
-      #     operator: Exists
-      #     effect: NoSchedule
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 4Gi
