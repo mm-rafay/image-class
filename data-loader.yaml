@@ -22,8 +22,8 @@ spec:
             export KAGGLE_USERNAME=mattwmorris &&
             export KAGGLE_KEY=fba82e30865d8bb52e3ccedcc6da345e &&
             python -c "import kagglehub; kagglehub.dataset_download('vinayakshanawad/ships-dataset')" &&
-            cp -r ships-dataset/train /mnt/data/train &&
-            cp -r ships-dataset/val   /mnt/data/val &&
+            cp -r "/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1/Ships dataset/train" /mnt/data/train &&
+            cp -r "/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1/Ships dataset/valid" /mnt/data/val &&
             echo "Data loaded successfully."
         volumeMounts:
           - name: data-vol
