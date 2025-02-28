@@ -10,7 +10,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: trainer
-        image: <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/ship-train:latest
+        image: 898121064240.dkr.ecr.us-east-1.amazonaws.com/ship-train:latest
         imagePullPolicy: Always
         env:
           - name: DATA_DIR
