@@ -5,6 +5,7 @@ set -e
 NAMESPACE="ship-detect"
 
 echo "Applying Kubernetes manifests..."
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 898121064240.dkr.ecr.us-east-1.amazonaws.com
 sudo kubectl apply -f ns.yaml 
 sudo kubectl apply -f data-pvc.yaml
 # sudo kubectl wait --for=condition=Bound pvc/ship-data-pvc -n ship-detect --timeout=300s
