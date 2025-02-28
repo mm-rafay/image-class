@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ship-data-loader
+  namespace: ship-detect
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: loader
+        # Use a lightweight Python image that can install kagglehub
+        image: python:3.9-slim  
+        command: ["/bin/bash", "-c"] 
+        args:
+          # 1) Install kagglehub
+          # 2) Download data
+          # 3) Copy to /mnt/data
+          - >
+            pip install --no-cache-dir kagglehub &&
+            export KAGGLE_USERNAME=mattwmorris &&
+            export KAGGLE_KEY=fba82e30865d8bb52e3ccedcc6da345e &&
+            python -c "import kagglehub; kagglehub.dataset_download('vinayakshanawad/ships-dataset')" &&
+            cp -r ships-dataset/train /mnt/data/train &&
+            cp -r ships-dataset/val   /mnt/data/val &&
+            echo "Data loaded successfully."
+        volumeMounts:
+          - name: data-vol
+            mountPath: /mnt/data
+        # Optionally, store credentials in a Secret rather than plaintext ENV
+      volumes:
+      - name: data-vol
+        persistentVolumeClaim:
+          claimName: ship-data-pvc
