@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: inference
-        image: $TRAIN_IMAGE_URI
+        image: 898121064240.dkr.ecr.us-east-1.amazonaws.com/ship-inference:latest
         imagePullPolicy: Always
         ports:
           - containerPort: 80
