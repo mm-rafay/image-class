@@ -11,23 +11,28 @@ spec:
       containers:
       - name: loader
         image: python:3.9-slim
+        volumeMounts:
+          - name: data-vol
+            mountPath: /mnt/data
         command: ["/bin/bash", "-c"]
         args:
-  - |  # single pipe in YAML means "literal block" for the entire shell script
-    # 1) Install needed packages
-    pip install --no-cache-dir kagglehub pyyaml
-    export KAGGLE_USERNAME="mattwmorris"
-    export KAGGLE_KEY="fba82e30865d8bb52e3ccedcc6da345e"
+          - |  # Use pipe scalar so the entire shell script is a single string
+            set -e
 
-    # 2) Download dataset from Kaggle
-    python -c "import kagglehub; kagglehub.dataset_download('vinayakshanawad/ships-dataset')"
+            # 1) Install needed packages
+            pip install --no-cache-dir kagglehub pyyaml
+            export KAGGLE_USERNAME="mattwmorris"
+            export KAGGLE_KEY="fba82e30865d8bb52e3ccedcc6da345e"
 
-    # 3) Copy raw YOLO data into /mnt/data/train and /mnt/data/valid
-    cp -r "/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1/Ships dataset/train" /mnt/data/train
-    cp -r "/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1/Ships dataset/valid" /mnt/data/val
+            # 2) Download dataset from Kaggle
+            python -c "import kagglehub; kagglehub.dataset_download('vinayakshanawad/ships-dataset')"
 
-    # 4) Create our reorganizing script on the fly
-    cat << 'EOF' >/reorganize_for_imagefolder.py
+            # 3) Copy raw YOLO data
+            cp -r "/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1/Ships dataset/train" /mnt/data/train
+            cp -r "/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1/Ships dataset/valid" /mnt/data/val
+
+            # 4) Create reorganizing script
+            cat <<'EOF' >/reorganize_for_imagefolder.py
 #!/usr/bin/env python3
 import os
 import shutil
@@ -44,25 +49,22 @@ VAL_LABELS_DIR   = os.path.join(DATA_ROOT, "val", "labels")
 DATA_YAML_PATH   = os.path.join(DATA_ROOT, "train", "data.yaml")
 
 def reorganize_split(images_dir, labels_dir, output_split_dir, class_names):
-    # etc...
+    # ...
     pass
 
 def main():
-    # etc...
+    # ...
     pass
 
 if __name__ == "__main__":
     main()
 EOF
 
-    # 5) Make script executable & run it
-    chmod +x /reorganize_for_imagefolder.py
-    python /reorganize_for_imagefolder.py
+            # 5) Run script
+            chmod +x /reorganize_for_imagefolder.py
+            python /reorganize_for_imagefolder.py
+            echo "Data loaded & reorganized successfully."
 
-    echo "Data loaded & reorganized successfully."
-        volumeMounts:
-          - name: data-vol
-            mountPath: /mnt/data
       volumes:
       - name: data-vol
         persistentVolumeClaim:
