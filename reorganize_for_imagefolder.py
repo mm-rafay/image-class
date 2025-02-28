@@ -17,7 +17,7 @@ VAL_LABELS_DIR = os.path.join(DATA_ROOT, "valid", "labels")
 
 # We'll assume data.yaml is in /mnt/data or /mnt/data/train
 # Adjust if it's in a different place
-DATA_YAML_PATH = os.path.join(DATA_ROOT, "train", "data.yaml")
+DATA_YAML_PATH = os.path.join(DATA_ROOT, "data.yaml")
 
 
 def reorganize_split(images_dir, labels_dir, output_split_dir, class_names):
