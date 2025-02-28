@@ -10,25 +10,127 @@ spec:
       restartPolicy: Never
       containers:
       - name: loader
-        # Use a lightweight Python image that can install kagglehub
-        image: python:3.9-slim  
-        command: ["/bin/bash", "-c"] 
+        image: python:3.9-slim
+        command: ["/bin/bash", "-c"]
         args:
-          # 1) Install kagglehub
-          # 2) Download data
-          # 3) Copy to /mnt/data
           - >
-            pip install --no-cache-dir kagglehub &&
-            export KAGGLE_USERNAME=mattwmorris &&
-            export KAGGLE_KEY=fba82e30865d8bb52e3ccedcc6da345e &&
+            # 1) Install needed packages
+            pip install --no-cache-dir kagglehub pyyaml &&
+            export KAGGLE_USERNAME="mattwmorris" &&
+            export KAGGLE_KEY="fba82e30865d8bb52e3ccedcc6da345e" &&
+
+            # 2) Download dataset from Kaggle
             python -c "import kagglehub; kagglehub.dataset_download('vinayakshanawad/ships-dataset')" &&
-            cp -r "/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1/Ships dataset/train" /mnt/data/train &&
-            cp -r "/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1/Ships dataset/valid" /mnt/data/val &&
-            echo "Data loaded successfully."
+
+            # 3) Copy raw YOLO data into /mnt/data/train and /mnt/data/valid
+            cp -r '/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1/Ships dataset/train' /mnt/data/train &&
+            cp -r '/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1/Ships dataset/valid' /mnt/data/val &&
+
+            # 4) Create our reorganizing script on the fly
+            cat << 'EOF' > /reorganize_for_imagefolder.py
+            #!/usr/bin/env python3
+            import os
+            import shutil
+            import yaml
+
+            DATA_ROOT = "/mnt/data"
+
+            TRAIN_IMAGES_DIR = os.path.join(DATA_ROOT, "train", "images")
+            TRAIN_LABELS_DIR = os.path.join(DATA_ROOT, "train", "labels")
+
+            VAL_IMAGES_DIR   = os.path.join(DATA_ROOT, "val", "images")   # using "val" here
+            VAL_LABELS_DIR   = os.path.join(DATA_ROOT, "val", "labels")
+
+            DATA_YAML_PATH   = os.path.join(DATA_ROOT, "train", "data.yaml")
+
+            def reorganize_split(images_dir, labels_dir, output_split_dir, class_names):
+                if not os.path.isdir(images_dir) or not os.path.isdir(labels_dir):
+                    print(f"Skipping {images_dir} or {labels_dir} because it doesn't exist.")
+                    return
+
+                os.makedirs(output_split_dir, exist_ok=True)
+                label_files = [f for f in os.listdir(labels_dir) if f.endswith(".txt")]
+                if not label_files:
+                    print(f"No label files found in {labels_dir}.")
+                    return
+
+                for lf in label_files:
+                    label_path = os.path.join(labels_dir, lf)
+                    with open(label_path, "r") as f:
+                        lines = [ln.strip() for ln in f if ln.strip()]
+
+                    if not lines:
+                        continue  # no bounding boxes
+
+                    # YOLO format: class_id cx cy w h
+                    first_line = lines[0].split()
+                    class_id = int(first_line[0]) if first_line else 0
+                    if class_id < 0 or class_id >= len(class_names):
+                        class_name = f"class{class_id}"
+                    else:
+                        class_name = class_names[class_id]
+
+                    # e.g. lf = 'image1.txt' => image 'image1.jpg'
+                    base_name = os.path.splitext(lf)[0]
+                    candidate_exts = [".jpg", ".jpeg", ".png"]
+                    image_path = None
+                    for ext in candidate_exts:
+                        test_path = os.path.join(images_dir, base_name + ext)
+                        if os.path.exists(test_path):
+                            image_path = test_path
+                            break
+
+                    if not image_path:
+                        print(f"No matching image for label file {lf} in {images_dir}")
+                        continue
+
+                    class_dir = os.path.join(output_split_dir, class_name)
+                    os.makedirs(class_dir, exist_ok=True)
+
+                    dst = os.path.join(class_dir, os.path.basename(image_path))
+                    print(f"Copying {image_path} => {dst}")
+                    shutil.copy2(image_path, dst)
+
+            def main():
+                # load class names from data.yaml
+                if not os.path.exists(DATA_YAML_PATH):
+                    print(f"{DATA_YAML_PATH} not found.")
+                    return
+                with open(DATA_YAML_PATH, 'r') as f:
+                    data_config = yaml.safe_load(f)
+                class_names = data_config.get("names", [])
+                print("Loaded class names:", class_names)
+
+                # reorganize train
+                print("Reorganizing TRAIN set...")
+                reorganize_split(
+                    images_dir=TRAIN_IMAGES_DIR,
+                    labels_dir=TRAIN_LABELS_DIR,
+                    output_split_dir=os.path.join(DATA_ROOT, "train"),  # /mnt/data/train
+                    class_names=class_names
+                )
+
+                # reorganize val
+                print("Reorganizing VAL set...")
+                reorganize_split(
+                    images_dir=VAL_IMAGES_DIR,
+                    labels_dir=VAL_LABELS_DIR,
+                    output_split_dir=os.path.join(DATA_ROOT, "val"),    # /mnt/data/val
+                    class_names=class_names
+                )
+
+            if __name__ == "__main__":
+                main()
+            EOF
+
+            # 5) Make script executable and run it
+            chmod +x /reorganize_for_imagefolder.py &&
+            python /reorganize_for_imagefolder.py &&
+
+            echo "Data loaded & reorganized successfully."
         volumeMounts:
           - name: data-vol
             mountPath: /mnt/data
-        # Optionally, store credentials in a Secret rather than plaintext ENV
       volumes:
       - name: data-vol
         persistentVolumeClaim:
