@@ -13,6 +13,8 @@ spec:
       labels:
         app: ship-inference
     spec:
+      imagePullSecrets:
+      - name: ecr-creds
       containers:
       - name: inference
         image: 898121064240.dkr.ecr.us-east-1.amazonaws.com/ship-inference:latest
