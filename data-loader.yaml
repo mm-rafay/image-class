@@ -28,11 +28,14 @@ spec:
               # 2) Download dataset from Kaggle
               python -c "import kagglehub; kagglehub.dataset_download('vinayakshanawad/ships-dataset')"
 
-              # 3) Copy raw YOLO data into /mnt/data
-              cp -r "/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1/Ships dataset/train" /mnt/data/train
-              cp -r "/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1/Ships dataset/valid" /mnt/data/val
+              # For convenience, define an env var for the KaggleHub path
+              DS_PATH="/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1"
 
-              # 4) Create reorganizing script
+              # 3) Copy raw YOLO data into /mnt/data
+              cp -r "$DS_PATH/Ships dataset/train" /mnt/data/train
+              cp -r "$DS_PATH/Ships dataset/valid" /mnt/data/val
+
+              # 4) Create reorganizing script (heredoc must be flush left)
               cat <<'EOF' >/reorganize_for_imagefolder.py
 #!/usr/bin/env python3
 import os
