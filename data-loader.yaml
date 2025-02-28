@@ -31,7 +31,7 @@ spec:
           # 3) Copy raw YOLO data into /mnt/data
           DS_PATH="/root/.cache/kagglehub/datasets/vinayakshanawad/ships-dataset/versions/1"
           cp -r "$DS_PATH/Ships dataset/train" /mnt/data/train
-          cp -r "$DS_PATH/Ships dataset/valid" /mnt/data/val
+          cp -r "$DS_PATH/Ships dataset/valid" /mnt/data/valid
           cp "$DS_PATH/Ships dataset/data.yaml" /mnt/data/data.yaml
           # 4) Create reorganizing script
           apt-get update
