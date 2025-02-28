@@ -7,6 +7,8 @@ spec:
   backoffLimit: 0           # do not retry failed jobs (adjust as needed)
   template:
     spec:
+      imagePullSecrets:
+      - name: ecr-creds
       restartPolicy: Never
       containers:
       - name: trainer
