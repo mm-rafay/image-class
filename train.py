@@ -33,11 +33,16 @@ val_transform = transforms.Compose([
 # Paths for train and val
 # Your data-loader job should have created subfolders in /mnt/data/train and /mnt/data/val
 # e.g., /mnt/data/train/Aircraft Carrier/, /mnt/data/train/Bulkers/, etc.
-train_path = os.path.join(data_dir, "train")
-val_path = os.path.join(data_dir, "val")
+data_dir = os.getenv("DATA_DIR", "/mnt/data")
 
-# Create the training dataset/loader
-train_dataset = datasets.ImageFolder(train_path, transform=train_transform)
+train_ds = datasets.ImageFolder(os.path.join(data_dir, "train"),
+                                transform=some_transform)
+val_ds   = datasets.ImageFolder(os.path.join(data_dir, "valid"),
+                                transform=some_transform)
+
+train_loader = torch.utils.data.DataLoader(train_ds, batch_size=..., shuffle=True, ...)
+val_loader   = torch.utils.data.DataLoader(val_ds,   batch_size=..., shuffle=False, ...)
+
 train_loader = torch.utils.data.DataLoader(train_dataset,
                                            batch_size=batch_size,
                                            shuffle=True,
