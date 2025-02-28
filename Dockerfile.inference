@@ -2,7 +2,7 @@
 FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
 
 # Install FastAPI, Uvicorn server, and other dependencies for inference
-RUN pip install --no-cache-dir fastapi \"uvicorn[standard]\" pillow python-multipart torchvision
+RUN pip install --no-cache-dir fastapi uvicorn[standard] pillow python-multipart torchvision
 
 WORKDIR /app
 
