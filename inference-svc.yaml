@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ship-inference-service
-  namespace: ship-detect
+  name: image-inference-service
+  namespace: image-class
 spec:
   type: LoadBalancer   # creates an external LB with a public endpoint (AWS ELB/NLB)
   ports:
@@ -10,4 +10,4 @@ spec:
       targetPort: 80   # container port
       protocol: TCP
   selector:
-    app: ship-inference
+    app: image-inference
