@@ -3,7 +3,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: ship-data-loader
-  namespace: ship-detect
+  namespace: image-class
 spec:
   backoffLimit: 0
   template:
@@ -46,4 +46,4 @@ spec:
       volumes:
       - name: data-vol
         persistentVolumeClaim:
-          claimName: ship-data-pvc
+          claimName: image-data-pvc
