@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: ship-data-loader
+  name: image-data-loader
   namespace: image-class
 spec:
   backoffLimit: 0
