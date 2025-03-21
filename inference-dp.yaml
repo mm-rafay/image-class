@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ship-inference
-  namespace: ship-detect
+  name: image-inference
+  namespace: image-class
 spec:
   replicas: 1  # start with 1; HPA can scale this up
   selector:
     matchLabels:
-      app: ship-inference
+      app: image-inference
   template:
     metadata:
       labels:
-        app: ship-inference
+        app: image-inference
     spec:
       imagePullSecrets:
       - name: ecr-creds
@@ -52,5 +52,5 @@ spec:
       volumes:
       - name: model-vol
         persistentVolumeClaim:
-          claimName: ship-model-pvc
+          claimName: image-model-pvc
       # nodeSelector/tolerations if needed for GPU nodes (similar to training job)
