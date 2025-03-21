@@ -1,5 +1,5 @@
-sudo kubectl delete pvc ship-model-pvc -n ship-detect
-sudo kubectl delete pvc ship-data-pvc -n ship-detect
-sudo kubectl delete job ship-train-job -n ship-detect
-sudo kubectl delete ns ship-detect
+sudo kubectl delete pvc image-model-pvc -n image-class
+sudo kubectl delete pvc image-data-pvc -n image-class
+sudo kubectl delete job image-train-job -n image-class
+sudo kubectl delete ns image-class
 sudo kubectl delete secret ecr-creds
