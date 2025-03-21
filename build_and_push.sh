@@ -4,8 +4,8 @@ set -e
 # Set AWS details
 AWS_ACCOUNT_ID="898121064240"
 AWS_REGION="us-east-1"         # e.g., us-east-1
-TRAIN_REPO="ship-train"
-INF_REPO="ship-inference"
+TRAIN_REPO="image-train"
+INF_REPO="image-inference"
 
 # ECR repository URIs
 TRAIN_IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$TRAIN_REPO:latest"
