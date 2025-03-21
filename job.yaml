@@ -1,8 +1,8 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: ship-train-job
-  namespace: ship-detect
+  name: image-train-job
+  namespace: image-class
 spec:
   backoffLimit: 0
   template:
@@ -12,7 +12,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: trainer
-        image: 898121064240.dkr.ecr.us-east-1.amazonaws.com/ship-train:latest
+        image: 898121064240.dkr.ecr.us-east-1.amazonaws.com/image-train:latest
         imagePullPolicy: Always
         env:
           - name: DATA_DIR
@@ -40,10 +40,10 @@ spec:
       volumes:
       - name: dataset-vol
         persistentVolumeClaim:
-          claimName: ship-data-pvc
+          claimName: image-data-pvc
       - name: model-vol
         persistentVolumeClaim:
-          claimName: ship-model-pvc
+          claimName: image-model-pvc
       - name: shm
         emptyDir:
           medium: Memory
