@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-NAMESPACE="ship-detect"
+NAMESPACE="image-class"
 
 echo "Applying Kubernetes manifests..."
 
